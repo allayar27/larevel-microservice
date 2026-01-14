@@ -1,0 +1,70 @@
+
+services:
+
+  # Web Server Service
+  product_nginx:
+    image: nginx:alpine
+    container_name: product_nginx
+    # ports:
+    #   - "8080:81"
+    volumes:
+      - ./src:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - product_app
+      - db
+    networks:
+      - shopping
+
+  #Database Service
+  # db:
+  #   image : mysql
+  #   container_name : product_db
+  #   volumes:
+  #     - ./mysql/data:/var/lib/mysql
+  #   ports:
+  #     - "3303:3306"
+  #   environment:
+  #     MYSQL_DATABASE: Product
+  #     # MYSQL_USER: root
+  #     MYSQL_ROOT_PASSWORD: password
+  #   networks:
+  #     - shopping
+
+  # Application Service
+  product_app:
+    container_name: product_app
+    build: 
+      context: ./php
+      dockerfile: Dockerfile
+    #user: "${UID}:${GID}"
+    volumes:
+      - ./src:/var/www
+    restart: always
+    # ports:
+    #   - "9000:9000"
+    # working_dir: /var/www
+    # command: php-fpm
+    networks:
+      - shopping
+    environment:
+      DB_HOST: product_db
+      DB_DATABASE: Product
+      DB_USERNAME: root
+      DB_PASSWORD: password
+
+  #phpMyAdmin Service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - "3400:80"
+    depends_on:
+      - db
+    networks:
+      - shopping
+
+
+networks:
+  shopping:
+    external: true

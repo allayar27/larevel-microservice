@@ -1,0 +1,39 @@
+
+services:
+
+  user_nginx:
+    image: nginx:alpine
+    container_name: user_nginx
+    volumes:
+      - ./src:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - user_app
+    networks:
+      - shopping
+
+  # Application Service
+  user_app:
+    container_name: user_app
+    build: 
+      context: ./php
+      dockerfile: Dockerfile
+    #user: "${UID}:${GID}"
+    volumes:
+      - ./src:/var/www
+    restart: always
+    environment:
+      DB_HOST: mysql
+      DB_DATABASE: user_service
+      DB_USERNAME: root
+      DB_PASSWORD: password
+    # working_dir: /var/www
+    # command: php-fpm
+    networks:
+      - shopping
+
+
+
+networks:
+  shopping:
+    external: true
