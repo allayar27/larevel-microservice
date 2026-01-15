@@ -13,10 +13,6 @@ class RabbitMQConsume extends Command
 
     public function handle(RabbitMQService $service)
     {
-        $this->info('RabbitMQ consumer started');
-
-        $service->consume('product.order.created');
-
-        return self::SUCCESS;
+        
     }
 }

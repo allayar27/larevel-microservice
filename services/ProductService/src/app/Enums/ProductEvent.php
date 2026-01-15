@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Enums\Enums;
+namespace App\Enums;
 
-enum UserEvent: string
+enum ProductEvent: string
 {
-    case CREATED = 'user.created';
-    case UPDATED = 'user.updated';
-    case DELETED = 'user.deleted';
+    case ORDER_CREATED = 'order.created';
 
     public static function fromPayload(array $payload): ?self
     {

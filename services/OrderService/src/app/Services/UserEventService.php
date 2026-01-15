@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\Enums\UserEvent;
+use App\Enums\UserEvent;
 use App\Handlers\UserCreatedEventHandler;
 use App\Handlers\UserDeletedEventHandler;
 use App\Handlers\UserUpdatedEventHandler;

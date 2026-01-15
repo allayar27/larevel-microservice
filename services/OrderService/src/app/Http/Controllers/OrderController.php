@@ -30,15 +30,15 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->all();
-
-        $product = ProductRead::where('product_id', $request->product_id)->firstOrFail();
+        // dd($request->all());
+        $product = ProductRead::where('product_id', '=', $request->product_id)->firstOrFail();
 
         $order = Order::query()->create([
-            'user_id'=> $request->user_id,
+            'product_id' => $product->product_id,
+            'count' => $request->count,
+            'user_id'=> $request->auth_user_id,
+            'total_price' => (float)$product->price * $request->count
         ]);
-
-        dispatch(new OrderCreated($order->toArray()));
 
         return $this->succes($order, 'Order created', 201);
     }

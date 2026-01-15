@@ -2,27 +2,27 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Product;
-use App\Services\RabbitMQService;
+use App\Enums\ProductEvent;
+use App\Services\ProductEventService;
 use Illuminate\Console\Command;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-class ConsumeOrderCreated extends Command
+class ConsumeProductEvents extends Command
 {
-    protected $signature = 'rabbitmq:consume-orders';
+    protected $signature = 'consume:product-events';
 
     protected $description = 'Command description';
 
-    public function handle(RabbitMQService $service)
+    public function handle(ProductEventService $service)
     {
         $connection = $service->setConnection();
+
         $channel = $connection->channel();
 
         $this->declareBindings($channel);
 
         $channel->basic_consume(
-            'product.order.created',
+            'order-service.products',
             '',
             false,
             false,
@@ -31,7 +31,7 @@ class ConsumeOrderCreated extends Command
             fn (AMQPMessage $msg) => $service->dispatch($msg)
         );
 
-        while ($channel->is_consuming()) {
+        while($channel->is_consuming()) {
             $channel->wait();
         }
     }
@@ -39,21 +39,24 @@ class ConsumeOrderCreated extends Command
     private function declareBindings($channel)
     {
         $channel->exchange_declare(
-            'order.events',
-            'direct',
+            'product.events',
+            'topic',
             false,
             true,
             false
         );
 
         $channel->queue_declare(
-            'product.order.created',
+            'order-service.products',
             false,
             true,
             false,
             false
         );
 
-        $channel->queue_bind('product.order.created', 'order.events', 'order.created');
+        $channel->queue_bind('order-service.products', 'product.events', ProductEvent::CREATED->value);
+        $channel->queue_bind('order-service.products', 'product.events', ProductEvent::UPDATED->value);
+        $channel->queue_bind('order-service.products', 'product.events', ProductEvent::DELETED->value);
     }
 }
+

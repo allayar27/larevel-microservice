@@ -9,12 +9,13 @@ final class OrderCreatedHandler
 {
     public function handle($payload): void
     {
-        $product = Product::find($payload['product_id']);
+        $data = $payload['data'];
+        $product = Product::find($data['product_id']);
 
         if (!$product) {
             throw new \RuntimeException('Product not found');
         }
 
-        $product->decrement('inventory', $payload['count']);
+        $product->decrement('count', $data['count']);
     }
 }

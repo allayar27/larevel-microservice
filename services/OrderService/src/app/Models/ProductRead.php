@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class ProductRead extends Model
 {
     protected $table = 'products_read';
-    protected $fillable = ['product_id', 'title', 'slug', 'price', 'article', 'inventory', 'description'];
+
+    protected $primaryKey = 'product_id';
+
+    public $incrementing = false;
+
+    protected $keyType = 'int';
+
+    protected $fillable = ['product_id', 'name', 'slug', 'price', 'count', 'article', 'description'];
     public $timestamps = false;
 }
